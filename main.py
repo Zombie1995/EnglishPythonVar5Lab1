@@ -15,17 +15,20 @@ def print_lithuania_flag(width: int = 36, stripe_height: int = 3) -> None:
 
 # ---------- Task 2: Repeating Pattern ----------
 
-def print_pattern(rows: int = 24, cols: int = 24, start_quarter: int = 1) -> None:
+def print_pattern(rows: int = 24, cols: int = 24) -> None:
+    # подобранное значение радиуса
     radius = min(rows, cols) // 2 - 2
+    # Рисует в верхних четвертях, поэтому смещаем на полтора вниз, чтобы было в центре
     center_y = rows / 1.5
     center_x = cols // 2
 
-    # Map quarter number to function and color
+    # Функции, возвращают bool если точка (x,y) должна быть раскрашена
+    # <= NUM отвечает примерно за толщину линии
     def draw_q1(y, x):
-        return x >= center_x and y < center_y and abs(math.hypot(x - center_x, y - center_y) - radius) <= 0.7
+        return x >= center_x and y < center_y and abs(math.hypot(x - center_x, y - center_y) - radius) <= 0.5
 
     def draw_q2(y, x):
-        return x < center_x and y < center_y and abs(math.hypot(x - center_x, y - center_y) - radius) <= 0.7
+        return x < center_x and y < center_y and abs(math.hypot(x - center_x, y - center_y) - radius) <= 0.5
 
     # Последовательно вызывать функции для каждой четверти
     for y in range(rows):
@@ -50,7 +53,6 @@ def print_function_graph(height: int = 12, width: int = 24) -> None:
     for row in range(height):
         line = []
         for col in range(width):
-            # В первом квадранте |x| = x, поэтому просто y = x
             if row == height - 1 - col:  # диагональная линия y = x
                 line.append("\033[31m*\033[0m")  # красная звёздочка
             elif col == 0:  # ось Y
@@ -64,29 +66,49 @@ def print_function_graph(height: int = 12, width: int = 24) -> None:
 
 # ---------- Task 4: Percentage ratio chart ----------
 
-def parse_sequence_file(path: str) -> List[float]:
+def parse_numbers_from_lines(path: str) -> List[float]:
+    """
+    Извлечение float с каждой строки в файле.
+    """
     if not os.path.exists(path):
         print(f"Sequence file '{path}' not found.")
         return []
-    with open(path, 'r', encoding='utf-8') as f:
-        content = f.read()
-    # Split by whitespace or commas / semicolons
-    tokens = re.split(r"[\s,;]+", content.strip())
-    nums: List[float] = []
-    for t in tokens:
-        if not t:
-            continue
-        try:
-            nums.append(float(t))
-        except ValueError:
-            pass  # ignore invalid tokens
-    return nums
+    
+    numbers: List[float] = []
+    
+    try:
+        with open(path, 'r', encoding='utf-8') as file:
+            for line_number, line in enumerate(file, 1):
+                line = line.strip()
+                
+                # Пропускаем пустые строки
+                if not line:
+                    continue
+                
+                try:
+                    # Пытаемся преобразовать строку в float
+                    number = float(line)
+                    numbers.append(number)
+                except ValueError:
+                    # Если строка не является числом, выводим предупреждение и пропускаем
+                    print(f"Warning: Line {line_number} contains invalid number: '{line}'")
+                    continue
+    
+    except IOError as e:
+        print(f"Error reading file '{path}': {e}")
+        return []
+    
+    return numbers
+
+def parse_sequence_file(path: str) -> List[float]:
+    """Обертка на всякий случай"""
+    return parse_numbers_from_lines(path)
 
 def compute_even_odd_absolute_averages(nums: List[float]) -> Tuple[float, float]:
     if not nums:
         return 0.0, 0.0
-    odd_vals = [nums[i] for i in range(0, len(nums), 2)]      # 1-based odd positions
-    even_vals = [nums[i] for i in range(1, len(nums), 2)]     # 1-based even positions
+    odd_vals = [nums[i] for i in range(0, len(nums), 2)]      # odd positions
+    even_vals = [nums[i] for i in range(1, len(nums), 2)]     # even positions
     avg_odd = abs(sum(odd_vals) / len(odd_vals)) if odd_vals else 0.0
     avg_even = abs(sum(even_vals) / len(even_vals)) if even_vals else 0.0
     return avg_odd, avg_even
@@ -111,23 +133,48 @@ def print_percentage_ratio_chart(path: str = "sequence.txt", bar_width: int = 40
 
 # ---------- Additional Task: Simple animation (2-3 frames) ----------
 
-def animate_flag(frames: int = 3, loops: int = 3, width: int = 36, stripe_height: int = 3, delay: float = 0.25) -> None:
-    """Simple waving animation of the Lithuanian flag using horizontal shifts."""
-    colors = [43, 42, 41]
-    shifts = [0, 2, 4][:frames]
-    for _ in range(loops):
-        for s in shifts:
+def animate_something(frames: int = 3, loops: int = 3, delay: float = 0.1) -> None:
+    """Простая анимация с тремя матрицами 5x5."""
+    
+    # Три разные матрицы
+    matrices = [
+        [
+            ['🌟', '⭐', '✨', '💫', '🌠'],
+            ['🔥', '💥', '⚡', '🌙', '☀️'],
+            ['🌈', '🌸', '🌺', '🌻', '🌹'],
+            ['🍎', '🍊', '🍋', '🍌', '🍇'],
+            ['🎵', '🎶', '🎸', '🎹', '🎺']
+        ],
+        [
+            ['A', 'B', 'C', 'D', 'E'],
+            ['F', 'G', 'H', 'I', 'J'],
+            ['K', 'L', 'M', 'N', 'O'],
+            ['P', 'Q', 'R', 'S', 'T'],
+            ['U', 'V', 'W', 'X', 'Y']
+        ],
+        [
+            ['1', '2', '3', '4', '5'],
+            ['6', '7', '8', '9', '0'],
+            ['@', '#', '$', '%', '&'],
+            ['+', '-', '*', '/', '='],
+            ['!', '?', '.', ',', ';']
+        ]
+    ]
+    
+    titles = ["ЭМОДЖИ", "БУКВЫ", "СИМВОЛЫ"]
+    
+    for loop in range(loops):
+        for frame in range(frames):
+            # Очищаем экран
             os.system('cls' if os.name == 'nt' else 'clear')
-            for bg in colors:
-                for h in range(stripe_height):
-                    # create a sine-based offset per line for wavy look
-                    offset = int(2 * math.sin((h + s) / 2))
-                    left_pad = ' ' * ((s + offset) % 6)
-                    print(left_pad + f"\033[{bg}m" + " " * width + "\033[0m")
-            print("(Lithuania flag animation)")
+            
+            # Выводим текущую матрицу
+            for row in matrices[frame]:
+                print("  " + " ".join(row))
+            
+            print()
             time.sleep(delay)
 
-# ---------- Orchestration ----------
 
 if __name__ == "__main__":
     print("--- Lithuanian Flag ---")
@@ -143,4 +190,4 @@ if __name__ == "__main__":
     print_percentage_ratio_chart()
     print()
     input("Press Enter to start animation...")
-    animate_flag()
+    animate_something()
