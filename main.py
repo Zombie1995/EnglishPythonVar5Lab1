@@ -1,5 +1,4 @@
 import os
-import sys
 import time
 import math
 import re
@@ -130,7 +129,7 @@ def animate_flag(frames: int = 3, loops: int = 3, width: int = 36, stripe_height
 
 # ---------- Orchestration ----------
 
-def run_all():
+if __name__ == "__main__":
     print("--- Lithuanian Flag ---")
     print_lithuania_flag()
     print()
@@ -145,6 +144,3 @@ def run_all():
     print()
     input("Press Enter to start animation...")
     animate_flag()
-
-if __name__ == "__main__":
-    run_all()
