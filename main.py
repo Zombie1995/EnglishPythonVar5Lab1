@@ -161,8 +161,6 @@ def animate_something(frames: int = 3, loops: int = 3, delay: float = 0.1) -> No
         ]
     ]
     
-    titles = ["ЭМОДЖИ", "БУКВЫ", "СИМВОЛЫ"]
-    
     for loop in range(loops):
         for frame in range(frames):
             # Очищаем экран
